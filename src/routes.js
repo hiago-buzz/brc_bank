@@ -2,6 +2,7 @@ const express = require('express');
 const { celebrate, Segments, Joi } = require('celebrate');
 const AuthorizationController = require('./controllers/AuthorizationController');
 const AccountController = require('./controllers/AccountController');       
+const UserController = require('./controllers/UserController');
 
 const routes = express.Router();
 
@@ -49,6 +50,45 @@ routes.delete('/account/:id', celebrate({
         id: Joi.string().required()
     })
 }), AccountController.delete);
+
+// USUARIOS
+
+routes.post('/user', celebrate({
+    [Segments.BODY]: Joi.object().keys({
+        cpfCnpj: Joi.string().required(),   
+        name: Joi.string().required(),
+        email: Joi.string().required(),
+        phone: Joi.string().required(),
+        image: Joi.string().required(),
+        password: Joi.string().required()
+    })
+}), UserController.create); 
+
+routes.get('/user/:id', celebrate({
+    [Segments.PARAMS]: Joi.object().keys({
+        id: Joi.string().required()
+    })
+}), UserController.show);
+
+routes.put('/user/:id', celebrate({
+    [Segments.PARAMS]: Joi.object().keys({
+        id: Joi.string().required()
+    }),
+    [Segments.BODY]: Joi.object().keys({    
+        name: Joi.string().required(),
+        email: Joi.string().required(),
+        phone: Joi.string().required(),
+        image: Joi.string().required(),
+        password: Joi.string().required()
+    })
+}), UserController.update); 
+
+routes.delete('/user/:id', celebrate({
+    [Segments.PARAMS]: Joi.object().keys({
+        id: Joi.string().required()
+    })
+}), UserController.delete);
+
 
 
 module.exports = routes;
