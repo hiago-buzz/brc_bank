@@ -3,6 +3,7 @@ const { celebrate, Segments, Joi } = require('celebrate');
 const AuthorizationController = require('./controllers/AuthorizationController');
 const AccountController = require('./controllers/AccountController');       
 const UserController = require('./controllers/UserController');
+const TransactionController = require('./controllers/TransactionController');
 
 const routes = express.Router();
 
@@ -27,11 +28,18 @@ routes.post('/account', celebrate({
     )
 }), AccountController.create);
 
+routes.get('/account', celebrate({ 
+    [Segments.QUERY]: Joi.object().keys({
+        cpfCnpj: Joi.string().required()
+    })
+}), AccountController.index);
+
 routes.get('/account/:id', celebrate({
     [Segments.PARAMS]: Joi.object().keys({
         id: Joi.string().required()
     })
 }), AccountController.show);                
+
 
 routes.put('/account/:id', celebrate({
     [Segments.PARAMS]: Joi.object().keys({
@@ -64,6 +72,7 @@ routes.post('/user', celebrate({
     })
 }), UserController.create); 
 
+
 routes.get('/user/:id', celebrate({
     [Segments.PARAMS]: Joi.object().keys({
         id: Joi.string().required()
@@ -88,6 +97,32 @@ routes.delete('/user/:id', celebrate({
         id: Joi.string().required()
     })
 }), UserController.delete);
+
+// TRANSACOES
+
+routes.post('/transaction', celebrate({
+    [Segments.BODY]: Joi.object().keys({
+        cpfCnpj: Joi.string().required(),   
+        transaction_type_id: Joi.number().required(),
+        amount: Joi.number().required(),
+        bank: Joi.string().required(),
+        account_number: Joi.string().required(),
+        agency: Joi.string().required(),
+        digit: Joi.string().required()
+    })
+}), TransactionController.create);
+
+routes.get('/transaction', celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+        cpfCnpj: Joi.string().required(),
+        transaction_type_id: Joi.number(),
+        startDate: Joi.date(),   
+        endDate: Joi.date(),
+        orderBy: Joi.string(),
+        order: Joi.string()
+    })
+}), TransactionController.index);
+
 
 
 

@@ -28,6 +28,41 @@ module.exports = {
         }
     },
 
+    async index(request, response) {
+        const { cpfCnpj } = request.query;
+
+        try {
+            const accounts = await connection('accounts')
+            .select('accounts.*')
+            .leftJoin('transactions', function() {
+                this.on('accounts.cpfCnpj', '=', 'transactions.cpfCnpj')
+                    .andOn('accounts.bank', '=', 'transactions.bank')
+                    .andOn('accounts.account_number', '=', 'transactions.account_number')
+                    .andOn('accounts.agency', '=', 'transactions.agency')
+                    .andOn('accounts.digit', '=', 'transactions.digit')
+
+            })
+            .where('accounts.cpfCnpj', cpfCnpj)
+            .sum(connection.raw('CASE WHEN transaction_type_id IN (1,2) THEN -amount ELSE amount END'))
+            .groupBy('accounts.id',);
+
+
+            if (!accounts || accounts.length === 0) {
+                return response.status(404).json({
+                    error: 'Nenhuma conta encontrada',
+                    message: 'Não foi possível encontrar contas para o usuário especificado'
+                });
+            }
+
+            return response.json(accounts);
+        } catch (err) {
+            console.error(err);
+            return response.status(400).json({
+                error: 'Erro ao buscar contas',
+                message: `Ocorreu um erro ao tentar buscar as contas: ${String(err)}`
+            });
+        }
+    },
 
     async show(request, response) {
         const { id } = request.params;
@@ -35,9 +70,16 @@ module.exports = {
         try {
             const account = await connection('accounts')
                 .select('accounts.*')
-                .leftJoin('transactions', 'accounts.cpfCnpj', 'transactions.cpfCnpj')
+                .leftJoin('transactions', function() {
+                    this.on('accounts.cpfCnpj', '=', 'transactions.cpfCnpj')
+                        .andOn('accounts.bank', '=', 'transactions.bank')
+                        .andOn('accounts.account_number', '=', 'transactions.account_number')
+                        .andOn('accounts.agency', '=', 'transactions.agency')
+                        .andOn('accounts.digit', '=', 'transactions.digit')
+    
+                })
                 .where('accounts.id', id)
-                .sum('transactions.amount as balance')
+                .sum(connection.raw('CASE WHEN transaction_type_id IN (1,2) THEN -amount ELSE amount END'))
                 .groupBy('accounts.id')
                 .first();
 
