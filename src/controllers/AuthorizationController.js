@@ -6,7 +6,7 @@ module.exports = {
 
         try {
             const user = await connection
-                .select('id', 'cpfCnpj', 'name', 'image')
+                .select('id')
                 .from('users')
                 .where('cpfCnpj', cpfCnpj)
                 .andWhere('password', password)

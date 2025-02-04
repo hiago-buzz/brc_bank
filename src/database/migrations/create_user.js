@@ -7,8 +7,6 @@ exports.up = function(knex) {
         table.string('phone',15).notNullable();
         table.string('image',255).notNullable();
         table.string('password',255).notNullable();
-        table.date('created_at').notNullable();
-        table.date('updated_at').notNullable();
         table.timestamps(true, true);
     });
 };
