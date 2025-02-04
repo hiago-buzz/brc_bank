@@ -6,7 +6,7 @@ module.exports = {
 
         try {
             const user = await connection
-                .select('*')
+                .select('id', 'cpfCnpj', 'name', 'image')
                 .from('users')
                 .where('cpfCnpj', cpfCnpj)
                 .andWhere('password', password)
@@ -22,6 +22,8 @@ module.exports = {
             return response.json({
                 id: user.id,
                 cpfCnpj: user.cpfCnpj,
+                name: user.name,
+                image: user.image,
                 message: 'Autenticação realizada com sucesso'
             });
             

@@ -43,3 +43,5 @@ coverage/
 
 # Arquivos de debug
 .debug/
+db.sqlite
+db.sqlite3
